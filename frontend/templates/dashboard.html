@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - GenAIsummarizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+
+        .navbar-links a:hover {
+            opacity: 0.8;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: 1px solid white;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        input[type="text"]:focus,
+        input[type="file"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .summary-item {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .summary-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .summary-item p {
+            margin: 8px 0;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        .summary-date {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .notification {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .notification.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .notification.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .navbar-links {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>GenAIsummarizer</h1>
+        <div class="navbar-links">
+            <span>Welcome, <strong id="username">User</strong><span id="guest-indicator" style="display:none; margin-left: 10px; background: #FFA500; padding: 3px 8px; border-radius: 3px; font-size: 12px;">(Guest)</span></span>
+            <a href="/history">History</a>
+            <button class="logout-btn" onclick="logout()" aria-label="Logout">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="notification" class="notification" role="alert"></div>
+
+        <div class="main-content">
+            <!-- Text Summarization -->
+            <div class="section">
+                <h2>Summarize Text</h2>
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchTab('text')" aria-label="Switch to text tab">Text</button>
+                    <button class="tab-button" onclick="switchTab('file')" aria-label="Switch to file tab">File</button>
+                    <button class="tab-button" onclick="switchTab('url')" aria-label="Switch to URL tab">URL</button>
+                </div>
+
+                <!-- Text Tab -->
+                <div id="text-tab" class="tab-content active">
+                    <form id="textForm" onsubmit="handleTextSummarize(event)">
+                        <div class="form-group">
+                            <label for="textInput">Enter Text to Summarize</label>
+                            <textarea id="textInput" placeholder="Paste your text here..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="textLength">Summary Length</label>
+                            <select id="textLength">
+                                <option value="short">Short</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="long">Long</option>
+                            </select>
+                        </div>
+                        <div class="loading" id="textLoading">Generating summary...</div>
+                        <div class="button-group">
+                            <button type="submit" class="btn-primary" aria-label="Summarize text">Summarize</button>
+                            <button type="reset" class="btn-secondary" aria-label="Clear text">Clear</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- File Tab -->
+                <div id="file-tab" class="tab-content">
+                    <form id="fileForm" onsubmit="handleFileSummarize(event)">
+                        <div class="form-group">
+                            <label for="fileInput">Upload File (PDF, DOCX, TXT)</label>
+                            <input type="file" id="fileInput" accept=".pdf,.docx,.txt" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fileLength">Summary Length</label>
+                            <select id="fileLength">
+                                <option value="short">Short</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="long">Long</option>
+                            </select>
+                        </div>
+                        <div class="loading" id="fileLoading">Processing file...</div>
+                        <div class="button-group">
+                            <button type="submit" class="btn-primary" aria-label="Summarize file">Summarize</button>
+                            <button type="reset" class="btn-secondary" aria-label="Clear file">Clear</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- URL Tab -->
+                <div id="url-tab" class="tab-content">
+                    <form id="urlForm" onsubmit="handleURLSummarize(event)">
+                        <div class="form-group">
+                            <label for="urlInput">Enter URL</label>
+                            <input type="text" id="urlInput" placeholder="https://example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="urlLength">Summary Length</label>
+                            <select id="urlLength">
+                                <option value="short">Short</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="long">Long</option>
+                            </select>
+                        </div>
+                        <div class="loading" id="urlLoading">Fetching and summarizing...</div>
+                        <div class="button-group">
+                            <button type="submit" class="btn-primary" aria-label="Summarize URL">Summarize</button>
+                            <button type="reset" class="btn-secondary" aria-label="Clear URL">Clear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Result Display -->
+            <div class="section">
+                <h2>Summary Result</h2>
+                <div id="resultContainer" style="display: none;">
+                    <div class="form-group">
+                        <label>Generated Summary:</label>
+                        <textarea id="resultText" readonly style="background: #f9f9f9;"></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn-primary" onclick="copySummary()" aria-label="Copy summary to clipboard">Copy Summary</button>
+                        <button class="btn-secondary" onclick="saveSummary()" aria-label="Save summary">Save Summary</button>
+                        <button class="btn-secondary" onclick="clearResult()" aria-label="Clear result">Clear</button>
+                    </div>
+                </div>
+                <div id="emptyState" style="text-align: center; color: #999; padding: 40px 20px;">
+                    <p>Summarization results will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('username') || 'User';
+            const isGuest = localStorage.getItem('is_guest') === 'true';
+            document.getElementById('username').textContent = username;
+            if (isGuest) {
+                document.getElementById('guest-indicator').style.display = 'inline';
+            }
+        });
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function handleTextSummarize(event) {
+            event.preventDefault();
+            const text = document.getElementById('textInput').value;
+            const length = document.getElementById('textLength').value;
+
+            showLoading('textLoading');
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        summary_length: length
+                    })
+                });
+
+                hideLoading('textLoading');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult(data.summary);
+                    showNotification('Summary generated successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    showNotification(error.detail?.error?.message || 'Failed to generate summary', 'error');
+                }
+            } catch (error) {
+                hideLoading('textLoading');
+                console.error('Error:', error);
+                showNotification('An error occurred', 'error');
+            }
+        }
+
+        async function handleFileSummarize(event) {
+            event.preventDefault();
+            const file = document.getElementById('fileInput').files[0];
+            const length = document.getElementById('fileLength').value;
+
+            if (!file) {
+                showNotification('Please select a file', 'error');
+                return;
+            }
+
+            showLoading('fileLoading');
+
+            try {
+                const token = localStorage.getItem('token');
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('summary_length', length);
+
+                const response = await fetch('/api/summarize/file', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                hideLoading('fileLoading');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult(data.summary);
+                    showNotification('File summarized successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    showNotification(error.detail?.error?.message || 'Failed to summarize file', 'error');
+                }
+            } catch (error) {
+                hideLoading('fileLoading');
+                console.error('Error:', error);
+                showNotification('An error occurred', 'error');
+            }
+        }
+
+        async function handleURLSummarize(event) {
+            event.preventDefault();
+            const url = document.getElementById('urlInput').value;
+            const length = document.getElementById('urlLength').value;
+
+            showLoading('urlLoading');
+
+            try {
+                const token = localStorage.getItem('token');
+                const formData = new FormData();
+                formData.append('url', url);
+                formData.append('summary_length', length);
+
+                const response = await fetch('/api/summarize/url', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                hideLoading('urlLoading');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult(data.summary);
+                    showNotification('URL summarized successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    showNotification(error.detail?.error?.message || 'Failed to summarize URL', 'error');
+                }
+            } catch (error) {
+                hideLoading('urlLoading');
+                console.error('Error:', error);
+                showNotification('An error occurred', 'error');
+            }
+        }
+
+        function displayResult(summary) {
+            document.getElementById('resultText').value = summary;
+            document.getElementById('resultContainer').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        function clearResult() {
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('resultText').value = '';
+        }
+
+        function copySummary() {
+            const text = document.getElementById('resultText').value;
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Summary copied to clipboard!', 'success');
+            });
+        }
+
+        function saveSummary() {
+            showNotification('Summary saved to history!', 'success');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            setTimeout(() => {
+                notification.className = 'notification';
+            }, 3000);
+        }
+
+        function showLoading(loadingId) {
+            document.getElementById(loadingId).classList.add('show');
+        }
+
+        function hideLoading(loadingId) {
+            document.getElementById(loadingId).classList.remove('show');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            localStorage.removeItem('is_guest');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
