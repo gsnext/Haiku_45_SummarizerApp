@@ -17,7 +17,7 @@ class SummarizationEngine:
         else:
             self.client = AzureOpenAI(
                 api_key=settings.AZURE_OPENAI_API_KEY,
-                api_version="2024-02-15-preview",
+                api_version="2024-12-01-preview",
                 azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
             )
 
@@ -79,8 +79,8 @@ Summary:"""
                     },
                     {"role": "user", "content": message},
                 ],
-                temperature=0.5,
-                max_tokens=500,
+                temperature=1,
+                max_completion_tokens=500,
             )
 
             summary = response.choices[0].message.content.strip()
